@@ -1,1 +1,24 @@
-
+import requests
+urls = [
+    'https://github.com/',
+    'https://www.binance.com/en',
+    'https://tomtit.tomsk.ru/',
+    'https://jsonplaceholder.typicode.com/',
+    'https://moodle.tomtit-tomsk.ru/'
+]
+for url in urls:
+    try:
+        otvet_servera = requests.get(url, timeout=10)
+        code_http = otvet_servera.status_code
+        if code_http == 200:
+            status = 'доступен'
+        elif code_http == 403:
+            status = 'вход запрещен'
+        elif code_http == 404:
+            status = 'не найден'
+        else:
+            status = 'не доступен'
+    except:
+        status = 'не доступен'
+        code_http = 'ошибка'
+    print(f'{url} - {status} - {code_http}')
