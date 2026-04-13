@@ -1,1 +1,100 @@
-
+import requests
+class GitHubApp:
+    def __init__(self):
+        self.api_url = 'https://api.github.com'
+    def get_profile(self, username):
+        data = requests.get(f'{self.api_url}/users/{username}')
+        if data.status_code != 200:
+            print(f'{username} не найден')
+            return None
+        data_user = data.json()
+        issues = 0
+        try:
+            issues_data = requests.get(
+                f'{self.api_url}/search/issues',
+                params={'q': f'author:{username} type:issue'}
+            )
+            if issues_data.status_code == 200:
+                issues = issues_data.json().get('total_count', 0)
+        except:
+            pass
+        return {
+            'имя': data_user.get('name', 'Не указано'),
+            'ссылка': data_user['html_url'],
+            'репозитории': data_user['public_repos'],
+            'обсуждения': issues,
+            'подписки': data_user['following'],
+            'подписчики': data_user['followers']
+        }
+    def get_repos(self, username):
+        data = requests.get(f'{self.api_url}/users/{username}/repos')
+        if data.status_code != 200:
+            print(f'{username} не найден')
+            return None
+        repositories = []
+        for repositoriy in data.json():
+            repositories.append({
+                'название': repositoriy['name'],
+                'ссылка': repositoriy['html_url'],
+                'просмотры': 0,
+                'язык': repositoriy['language'] or 'Не указан',
+                'видимость': 'Публичный' if not repositoriy['private'] else 'Приватный',
+                'ветка': repositoriy['default_branch']
+            })
+        return repositories
+    def search_repos(self, zapros):
+        data = requests.get(
+            f'{self.api_url}/search/repositories',
+            params={'q': zapros, 'per_page': 10}
+        )
+        if data.status_code != 200:
+            print('Ошибка поиска')
+            return None
+        resultats = []
+        for resultat in data.json().get('items', []):
+            resultats.append({
+                'название': resultat['full_name'],
+                'ссылка': resultat['html_url'],
+                'язык': resultat['language'] or 'Не указан'
+            })
+        return resultats
+api = GitHubApp()
+while True:
+    print('\n1. Профиль пользователя')
+    print('2. Репозитории пользователя')
+    print('3. Поиск репозиториев')
+    print('4. Выход')
+    vibor = input('Выбор: ')
+    if vibor == '1':
+        name = input('Имя пользователя: ')
+        profile = api.get_profile(name)
+        if profile:
+            print(f'\nИмя: {profile['имя']}')
+            print(f'Ссылка: {profile['ссылка']}')
+            print(f'Репозиториев: {profile['репозитории']}')
+            print(f'Обсуждений: {profile['обсуждения']}')
+            print(f'Подписок: {profile['подписки']}')
+            print(f'Подписчиков: {profile['подписчики']}')
+    elif vibor == '2':
+        name = input('Имя пользователя: ')
+        repositories = api.get_repos(name)
+        if repositories:
+            print(f'\nРепозитории:')
+            for repositoriy in repositories:
+                print(f'\n{repositoriy['название']}')
+                print(f'   {repositoriy['ссылка']}')
+                print(f'   Просмотров: {repositoriy['просмотры']}')
+                print(f'   Язык: {repositoriy['язык']}')
+                print(f'   Видимость: {repositoriy['видимость']}')
+                print(f'   Ветка: {repositoriy['ветка']}')
+    elif vibor == '3':
+        zapros = input('Название: ')
+        resultats = api.search_repos(zapros)
+        if resultats:
+            print(f'\nРезультаты:')
+            for resultat in resultats:
+                print(f'\n{resultat['название']}')
+                print(f'   {resultat['ссылка']}')
+                print(f'   Язык: {resultat['язык']}')
+    elif vibor == '4':
+        break
