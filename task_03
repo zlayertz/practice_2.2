@@ -14,7 +14,7 @@ def obnovit_courses():
         data_json = otvet_servera.json()
         courses = data_json['Valute']
     except:
-        print('Ошибка! Не могу получить курсы')
+        print('Не могу получить курсы')
 def pokazat_vse():
     print('\n\t\t\tВсе валюты')
     for cod_valute in courses:
@@ -29,7 +29,7 @@ def nayti_valutu():
     else:
         print('Нет такой валюты')
 def sozdat_gruppu():
-    new_group = input('Придумайте название группы: ')
+    new_group = input('Название группы: ')
     if new_group in groups:
         print('Такая группа уже есть')
     else:
