@@ -8,5 +8,4 @@ while True:
     print(f'CPU: {cpu}%')
     print(f'RAM: {ram.percent}%  ({ram.used // (1024 ** 3)}/{ram.total // (1024 ** 3)} ГБ)')
     print(f'Диск: {disk.percent}%  ({disk.used // (1024 ** 3)}/{disk.total // (1024 ** 3)} ГБ)')
-    print('===' * 8)
     time.sleep(4)
